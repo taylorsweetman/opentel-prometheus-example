@@ -9,6 +9,7 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
+import io.github.cdimascio.dotenv.Dotenv;
 
 /**
  * Example of using the PrometheusHttpServer to convert OTel metrics to Prometheus format and expose
@@ -19,13 +20,9 @@ import io.opentelemetry.context.Scope;
  */
 public final class PrometheusExample {
     public static void main(String[] args) throws InterruptedException {
-        int prometheusPort = 0;
-        try {
-            prometheusPort = Integer.parseInt(args[0]);
-        } catch (Exception e) {
-            System.out.println("Port not set, or is invalid. Exiting");
-            System.exit(1);
-        }
+        Dotenv dotenv = Dotenv.load();
+        var prometheusPort = Integer.parseInt(dotenv.get("PROMETHEUS_PORT", "19090"));
+
         // it is important to initialize your SDK as early as possible in your application's lifecycle
         OpenTelemetry openTelemetry = ExampleConfiguration.initOpenTelemetry(prometheusPort);
 
