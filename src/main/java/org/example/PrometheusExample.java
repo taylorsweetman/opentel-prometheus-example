@@ -27,22 +27,19 @@ public final class PrometheusExample {
         OpenTelemetry openTelemetry = ExampleConfiguration.initOpenTelemetry(prometheusPort);
 
         Tracer tracer = openTelemetry.getTracer("io.opentelemetry.example.prometheus");
-        Meter meter = openTelemetry.getMeter("io.opentelemetry.example.prometheus");
-        LongCounter counter = meter.counterBuilder("example.counter").build();
-        LongHistogram histogram = meter.histogramBuilder("super.timer").ofLongs().setUnit("ms").build();
+        OpenTelemetryMetrics metrics = new OpenTelemetryMetrics(openTelemetry, "etl.example", "all.steps");
 
         for (int i = 0; i < 500; i++) {
-            long startTime = System.currentTimeMillis();
+            metrics.startTimer();
             Span exampleSpan = tracer.spanBuilder("exampleSpan").startSpan();
             Context exampleContext = Context.current().with(exampleSpan);
             try (Scope _ignored = exampleContext.makeCurrent()) {
-                counter.add(1);
+                metrics.incrementCounter(1);
                 exampleSpan.setAttribute("good", true);
                 exampleSpan.setAttribute("exampleNumber", i);
                 ETLJob.run();
             } finally {
-                histogram.record(
-                        System.currentTimeMillis() - startTime, Attributes.empty(), exampleContext);
+                metrics.stopTimer();
                 exampleSpan.end();
             }
         }
