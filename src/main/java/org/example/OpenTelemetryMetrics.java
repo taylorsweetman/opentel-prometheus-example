@@ -36,11 +36,11 @@ public class OpenTelemetryMetrics {
                 .build();
     }
 
-    public void start() {
+    public void startTimer() {
         this.startTime = System.currentTimeMillis();
     }
 
-    public void stop() {
+    public void stopTimer() {
         if (histogram == null) initHistogram();
 
         histogram.record(System.currentTimeMillis() - startTime);
