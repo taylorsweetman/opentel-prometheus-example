@@ -19,7 +19,7 @@ import io.github.cdimascio.dotenv.Dotenv;
  * The Gauge callback gets executed every collection interval.
  */
 public final class PrometheusExample {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Dotenv dotenv = Dotenv.load();
         var prometheusPort = Integer.parseInt(dotenv.get("PROMETHEUS_PORT", "19090"));
 
@@ -39,7 +39,7 @@ public final class PrometheusExample {
                 counter.add(1);
                 exampleSpan.setAttribute("good", true);
                 exampleSpan.setAttribute("exampleNumber", i);
-                Thread.sleep(1000);
+                ETLJob.run();
             } finally {
                 histogram.record(
                         System.currentTimeMillis() - startTime, Attributes.empty(), exampleContext);
